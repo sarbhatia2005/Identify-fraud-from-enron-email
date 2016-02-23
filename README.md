@@ -1,4 +1,3 @@
-ud120-projects
+Mini Projects for the Intro to Machine Learning course from Udacity
 ==============
-
-Starter project code for students taking Udacity ud120
+Part of the Udacity Data Analyst Nanodegree
