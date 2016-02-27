@@ -1,9 +1,11 @@
 #!/usr/bin/python
-
+from __future__ import print_function
 import matplotlib.pyplot as plt
 from prep_terrain_data import makeTerrainData
 from class_vis import prettyPicture
-
+from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.neighbors import KNeighborsClassifier
 features_train, labels_train, features_test, labels_test = makeTerrainData()
 
 
@@ -16,29 +18,27 @@ grade_slow = [features_train[ii][0] for ii in range(0, len(features_train)) if l
 bumpy_slow = [features_train[ii][1] for ii in range(0, len(features_train)) if labels_train[ii]==1]
 
 
-#### initial visualization
-plt.xlim(0.0, 1.0)
-plt.ylim(0.0, 1.0)
-plt.scatter(bumpy_fast, grade_fast, color = "b", label="fast")
-plt.scatter(grade_slow, bumpy_slow, color = "r", label="slow")
-plt.legend()
-plt.xlabel("bumpiness")
-plt.ylabel("grade")
-plt.show()
-################################################################################
+def classify(clf, features_train, labels_train, **kwargs):
+    clf = clf(**kwargs)
+    clf.fit(features_train, labels_train)
+    return clf
 
+def classifyAdaboost(features_train, labels_train, n_estimators=100):
+    return classify(AdaBoostClassifier, features_train, labels_train, n_estimators=n_estimators)
 
-### your code here!  name your classifier object clf if you want the 
-### visualization code (prettyPicture) to show you the decision boundary
+def classifyKNN(features_train, labels_train, n_neighbors=8):
+    return classify(KNeighborsClassifier, features_train, labels_train, n_neighbors=n_neighbors)
 
+def classifyRF(features_train, labels_train, n_estimators=100):
+    return classify(RandomForestClassifier, features_train, labels_train, n_estimators=n_estimators)
 
-
-
-
-
-
-
-try:
-    prettyPicture(clf, features_test, labels_test)
-except NameError:
-    pass
+if __name__ == "__main__":
+    clf_dict = {"knn": classifyKNN,
+                "adaboost": classifyAdaboost,
+                "randomforest": classifyRF}
+    for name, clf in clf_dict.iteritems():
+        print(name, ":")
+        clf_fitted = clf(features_train, labels_train)
+        pred = clf_fitted.predict(features_test)
+        print("Accuracy:", accuracy_score(labels_test, pred))
+        prettyPicture(clf_fitted, features_test, labels_test)
