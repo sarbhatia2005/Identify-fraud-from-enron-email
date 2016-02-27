@@ -1,0 +1,5 @@
+no. of Chris training emails: 7936
+no. of Sara training emails: 7884
+Training time: 3.675 s
+prediction time: 0.004 s
+0.967007963595
