@@ -12,11 +12,12 @@
     You fill in the regression code where indicated:
 """    
 
-
+from __future__ import print_function, division
 import sys
 import pickle
 sys.path.append("../tools/")
 from feature_format import featureFormat, targetFeatureSplit
+from sklearn import linear_model
 dictionary = pickle.load( open("../final_project/final_project_dataset_modified.pkl", "r") )
 
 ### list the features you want to look at--first item in the 
@@ -29,21 +30,16 @@ target, features = targetFeatureSplit( data )
 from sklearn.cross_validation import train_test_split
 feature_train, feature_test, target_train, target_test = train_test_split(features, target, test_size=0.5, random_state=42)
 train_color = "b"
-test_color = "b"
+test_color = "r"
 
 
+reg = linear_model.LinearRegression()
+reg.fit(feature_train, target_train)
 
-### Your regression goes here!
-### Please name it reg, so that the plotting code below picks it up and 
-### plots it correctly. Don't forget to change the test_color above from "b" to
-### "r" to differentiate training points from test points.
-
-
-
-
-
-
-
+print("Slope: {}".format(reg.coef_[0]))
+print("Intercept: {}".format(reg.intercept_))
+print("R square on train: {}".format(reg.score(X=feature_train, y=target_train)))
+print("R square on test: {}".format(reg.score(X=feature_test, y=target_test)))
 
 ### draw the scatterplot, with color-coded training and testing points
 import matplotlib.pyplot as plt
@@ -64,6 +60,9 @@ try:
     plt.plot( feature_test, reg.predict(feature_test) )
 except NameError:
     pass
+reg.fit(feature_test, target_test)
+print("Slope of test fit: {}".format(reg.coef_[0]))
+plt.plot(feature_train, reg.predict(feature_train), color="b")
 plt.xlabel(features_list[1])
 plt.ylabel(features_list[0])
 plt.legend()
