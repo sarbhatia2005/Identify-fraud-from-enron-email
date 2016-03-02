@@ -14,6 +14,7 @@ import sys
 sys.path.append("../tools/")
 from feature_format import featureFormat, targetFeatureSplit
 from sklearn import cluster
+from sklearn.preprocessing import MinMaxScaler
 
 
 
@@ -52,19 +53,26 @@ def get_values(variable):
     :param variable:  variable name to get values from (str)
     :return: list with all the values for variable.
     """
-    return [v[variable] for v in data_dict.itervalues() if v[variable] != "NaN"]
+    return [float(v[variable]) for v in data_dict.itervalues() if v[variable] != "NaN"]
 
-exercised_stock = get_values("exercised_stock_options")
+exercised_stock = numpy.reshape(get_values("exercised_stock_options"), (-1, 1))
 max_eso = max(exercised_stock)
 min_eso = min(exercised_stock)
 print("Exercised stock options:")
 print("Max:", max_eso)
 print("Min:", min_eso)
+eso_scaler = MinMaxScaler()
+eso_scaler.fit(exercised_stock, (1, -1))
+print("Scaled $1 million:", eso_scaler.transform([[1e6]]))
 
-salary = get_values("salary")
+salary = numpy.reshape(get_values("salary"), (-1,1))
 print("Salary:")
 print("Max:", max(salary))
 print("Min:", min(salary))
+
+sal_scaler = MinMaxScaler()
+sal_scaler.fit(salary)
+print("Scaled $200,000:", sal_scaler.transform([[200000.]]))
 
 ### the input features we want to use 
 ### can be any key in the person-level dictionary (salary, director_fees, etc.) 
