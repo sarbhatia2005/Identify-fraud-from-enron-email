@@ -1,7 +1,10 @@
 #!/usr/bin/python
 
+from __future__ import division, print_function
 import pickle
 import numpy
+from sklearn import tree
+from sklearn import metrics
 numpy.random.seed(42)
 
 
@@ -35,9 +38,17 @@ features_test  = vectorizer.transform(features_test).toarray()
 features_train = features_train[:150].toarray()
 labels_train   = labels_train[:150]
 
+cls = tree.DecisionTreeClassifier()
 
-
-### your code goes here
+cls.fit(X=features_train, y=labels_train)
+pred_train = cls.predict(X=features_train)
+pred_test = cls.predict(X=features_test)
+print("Accuracy on training set:", metrics.accuracy_score(y_true=labels_train, y_pred=pred_train))
+print("Accuracy on test set:", metrics.accuracy_score(y_true=labels_test, y_pred=pred_test))
+for i, value in enumerate(cls.feature_importances_):
+    if value > 0.2:
+        print("Feature {}: {} importance. Feature name:{}"
+              .format(i, value, vectorizer.get_feature_names()[i]))
 
 
 

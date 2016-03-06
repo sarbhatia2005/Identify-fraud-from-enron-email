@@ -39,9 +39,7 @@ temp_counter = 0
 
 for name, from_person in [("sara", from_sara), ("chris", from_chris)]:
     for path in from_person:
-        ### only look at first 200 emails when developing
-        ### once everything is working, remove this line to run over full dataset
-        temp_counter += 1
+
 
         path = os.path.join('..', path[:-1])
         print(path)
@@ -49,7 +47,8 @@ for name, from_person in [("sara", from_sara), ("chris", from_chris)]:
 
         text = parseOutText(email) ### use parseOutText to extract the text from the opened email
 
-        words_to_remove = ["sara", "shackleton", "chris", "germani"]
+        words_to_remove = ["sara", "shackleton", "chris",
+                           "germani", "sshacklensf", "cgermannsf"]
         for word in words_to_remove:
             text = text.replace(word, "")
 
