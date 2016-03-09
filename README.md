@@ -1,3 +1,8 @@
-Mini Projects for the Intro to Machine Learning course from Udacity
+Identify fraud from Enron emails
 ==============
-Part of the Udacity Data Analyst Nanodegree
+
+This repository contains the Machine Learning final project. The goal is to
+identify people of interest from the Enron dataset.
+
+Additionally, the repository also contains the mini projects which build up
+to the final project.
