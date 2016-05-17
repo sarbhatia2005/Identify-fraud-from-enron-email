@@ -10,3 +10,4 @@ my_dataset.pkl
 my_feature_list.pkl
 *.idea
 choose_your_own/test.png
+*.ipynb_checkpoints
