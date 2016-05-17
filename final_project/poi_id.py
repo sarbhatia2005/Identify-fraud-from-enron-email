@@ -26,9 +26,9 @@ from tester import dump_classifier_and_data
 
 # Load the dictionary containing the dataset
 def load_dataset():
-    """
+    """Loads the enron dataset.
 
-    :return:
+    :return: data dictionary
     """
     with open("final_project_dataset.pkl", "r") as data_file:
         data_dict = pickle.load(data_file)
@@ -36,11 +36,11 @@ def load_dataset():
 
 
 def outlier_removal(data_dict, list_of_names):
-    """
+    """Removes outliers from the data dictionary.
 
-    :param data_dict:
-    :param list_of_names:
-    :return:
+    :param data_dict: enron data dictionary
+    :param list_of_names: list of names to remove from the data
+    :return: data_dict with the outliers removed.
     """
     for i in list_of_names:
         data_dict.pop(i)
@@ -49,10 +49,12 @@ def outlier_removal(data_dict, list_of_names):
 
 #Extract features and labels from dataset for local testing
 def extract_features(dataset, features_list):
-    """
+    """ Extracts features from the dataset and
+    converts them to numpy arrays suitable to use with sklearn.
 
-    :param dataset:
-    :param features_list:
+    :param dataset: enron dataset dictionary
+    :param features_list: list of features to extract. element
+        of the list should be the labels. In this project, it is the "poi" variable.
     :return:
     """
     data = featureFormat(dataset, features_list)
@@ -61,9 +63,9 @@ def extract_features(dataset, features_list):
 
 
 def add_new_features(data_dict, new_feature_funs):
-    """
+    """Adds new features to the dataset
 
-    :param data_dict:
+    :param data_dict: enron dataset dictionary.
     :param new_feature_funs: list of functions
     that when applied to a person subdictionary return
     a dictionary with the name and value of the new feature {name: value}
@@ -76,11 +78,12 @@ def add_new_features(data_dict, new_feature_funs):
 
 
 def compute_fraction(numerator, denominator):
-    """
+    """Compute a fraction between two values.
+    If any of the values is a string, returns "NaN".
 
     :param numerator:
     :param denominator:
-    :return:
+    :return: result of division: float or "NaN"
     """
     try:
         fraction = numerator / denominator
@@ -90,10 +93,10 @@ def compute_fraction(numerator, denominator):
 
 
 def fraction_from_poi(person_values):
-    """
+    """Calculate fraction of emails from poi
 
-    :param person_values:
-    :return:
+    :param person_values: subdictionary of enrondata with the feature values
+    :return: dictionary with fraction of emails from poi
     """
     poi_messages = person_values["from_poi_to_this_person"]
     all_messages = person_values["to_messages"]
@@ -102,10 +105,10 @@ def fraction_from_poi(person_values):
 
 
 def fraction_to_poi(person_values):
-    """
+    """Calculate fraction of emails to poi
 
-    :param person_values:
-    :return:
+    :param person_values: subdictionary of enrondata with the feature values
+    :return: dictionary with fraction of emails to poi
     """
     poi_messages = person_values["from_this_person_to_poi"]
     all_messages = person_values["from_messages"]
@@ -114,10 +117,10 @@ def fraction_to_poi(person_values):
 
 
 def fraction_shared(person_values):
-    """
+    """Calculate fraction of shared receipt emails with poi
 
-    :param person_values:
-    :return:
+    :param person_values: subdictionary of enrondata with the feature values
+    :return: dictionary with fraction of shared receipt emails with poi.
     """
     poi_messages = person_values["shared_receipt_with_poi"]
     all_messages = person_values["to_messages"]
@@ -126,10 +129,10 @@ def fraction_shared(person_values):
 
 
 def ratio_payments_salary(person_values):
-    """
+    """Calculate ratio of salary and total payments
 
-    :param person_values:
-    :return:
+    :param person_values: subdictionary of enrondata with the feature values
+    :return: dictionary with ratio of salary and total payments
     """
     salary = person_values["salary"]
     total_payments = person_values["total_payments"]
@@ -138,10 +141,10 @@ def ratio_payments_salary(person_values):
 
 
 def ratio_stocks_salary(person_values):
-    """
+    """Calculate ratio of salary and total stock value
 
-    :param person_values:
-    :return:
+    :param person_values: subdictionary of enrondata with the feature values
+    :return: dictionary with ration of salary and total stock value
     """
     salary = person_values["salary"]
     total_stock_value = person_values["total_stock_value"]
@@ -150,9 +153,11 @@ def ratio_stocks_salary(person_values):
 
 
 def NaiveBayesPipeline():
-    """
+    """Pipeline for NaiveBayes Classifier
+    - Feature selection made with SelectKBest
+    - Classifier is GaussianNB
 
-    :return:
+    :return: Pipeline with features_selector and clf
     """
     features_selector = SelectKBest(f_classif)
     clf = GaussianNB()
@@ -161,9 +166,11 @@ def NaiveBayesPipeline():
 
 
 def AdaBoostPipeline():
-    """
+    """Pipeline for AdaBoost Classifier
+        - Feature selection made with SelectKBest
+        - Classifier is AdaBoostClassifier with DecisionTreeClassifier as a base estimator
 
-    :return:
+        :return: Pipeline with features_selector and clf
     """
     features_selector = SelectKBest(f_classif)
     clf = AdaBoostClassifier(base_estimator=DecisionTreeClassifier(), random_state=123)
@@ -176,11 +183,13 @@ def search_params_classifier(clf, my_dataset, features_list, param_grid):
     Searches for the best parameters for the classifier and returns
     a classifier with the best parameters set.
 
-    :param clf:
-    :param my_dataset:
-    :param features_list:
-    :param param_grid:
-    :return:
+    :param clf: function to create classifier
+    :param my_dataset: dataset to fit the classifier to
+    :param features_list: list of features to use
+    :param param_grid: parameter grid to perform grid search for the best parameter combination
+    :return: tuple of:
+                search_params: gridsearch object
+                search_params.best_estimator_: classifier with the best parameter combination
     """
     labels, features = extract_features(my_dataset, features_list)
     cross_validation_iter = StratifiedShuffleSplit(y=labels, test_size=0.2, random_state=123, n_iter=100)
@@ -197,11 +206,13 @@ def search_params_classifier(clf, my_dataset, features_list, param_grid):
 
 
 def my_cross_validation(estim, features_list):
-    """
+    """ Performs cross_validation and prints values
+    of Precision, Recall and F1 Score for the classifier
 
-    :param estim:
-    :param features_list:
-    :return:
+    :param estim: classifier with parameters already set.
+    :param features_list: list of features to use
+    :return: None
+        Prints values of Precision, Recall and F1 Score.
     """
     labels, features = extract_features(my_dataset, features_list)
     cross_validation_iter = StratifiedShuffleSplit(y=labels, test_size=0.2, random_state=123, n_iter=100)
